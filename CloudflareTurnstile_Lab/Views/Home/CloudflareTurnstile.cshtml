@@ -1,0 +1,108 @@
+﻿@section styles{
+    <style>
+
+        body {
+            display: flex;
+            align-items: center;
+            padding-top: 40px;
+            padding-bottom: 40px;
+            background-color: #fefefe;
+            flex-direction: column;
+        }
+
+        .form-signin {
+            width: 100%;
+            max-width: 330px;
+            padding: 15px;
+            margin: auto;
+        }
+
+            .form-signin .checkbox {
+                font-weight: 400;
+            }
+
+            .form-signin .form-floating:focus-within {
+                z-index: 2;
+            }
+
+            .form-signin input[type="text"] {
+                margin-bottom: -1px;
+                border-bottom-right-radius: 0;
+                border-bottom-left-radius: 0;
+            }
+
+            .form-signin input[type="password"] {
+                margin-bottom: 10px;
+                border-top-left-radius: 0;
+                border-top-right-radius: 0;
+            }
+    </style>
+}
+@section scripts_head{
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" crossorigin="anonymous"></script>
+}
+<div id="app">
+    <h2 class="h3 mb-3 fw-normal">Cloudflare Turnstile範例</h2>
+
+    <div class="form-floating mb-3">
+        <input type="text" id="user" class="form-control">
+        <label for="user">User name</label>
+    </div>
+    <div class="form-floating mb-3">
+        <input type="password" id="pass" class="form-control">
+        <label for="pass">Password</label>
+    </div>
+
+    <div class="checkbox mb-3">
+        <div id="myWidget"></div>
+    </div>
+    <button class="w-100 btn btn-lg btn-primary" v-on:click="login">Sign in</button>
+</div>
+@section scripts_body{
+    <script>
+        turnstile.ready(function () {
+            turnstile.render('#myWidget', {
+                sitekey: '0x4AAAAAAAPGUjEJ-frzVnmP',
+                theme: 'light',
+                size: "normal",
+                appearance: "always",
+                callback: function (token) {
+                    verify(token)
+                }
+            });
+        })
+        
+        const app = {
+            data() {
+                return {
+                    account:'',
+                    password:''
+                }
+            },
+            methods: {
+                login:login
+            },
+            mounted() {
+                // _turnstileCb();
+            },
+        }
+        let myApp = Vue.createApp(app);
+        myApp.mount("#app");
+
+        function login() {
+
+        }
+        function verify(token) {
+            let data = { id: token }
+            axios.post('/api/Validate/ValidateTurnstile', data).then(response => {
+                // 處理成功的回應
+                console.log(response.data);
+            })
+                .catch(error => {
+                    // 處理錯誤
+                    console.error('Error:', error);
+                });
+
+        }
+    </script>
+}
