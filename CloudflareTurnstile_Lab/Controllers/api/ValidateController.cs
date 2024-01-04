@@ -33,5 +33,24 @@ namespace CloudflareTurnstile_Lab.Controllers.api
             }
             return Content("Turnstile token validation failed!");
         }
+        
+        [HttpPost]
+        public IActionResult ValidateGoogle([FromBody] Token recaptchaToken)
+        {
+            var userIP = HttpContext.Connection.RemoteIpAddress.ToString();
+            // 與 Turnstile 驗證
+            var isValid = _captchaService.ValidatGoogleToken(recaptchaToken.Id, userIP);
+
+            if (isValid)
+            {
+                // 驗證成功，執行正常的邏輯，例如處理表單提交
+                return Content("Form submitted successfully!");
+            }
+            else
+            {
+                // 驗證失敗，返回錯誤信息
+            }
+            return Content("Turnstile token validation failed!");
+        }
     }
 }
