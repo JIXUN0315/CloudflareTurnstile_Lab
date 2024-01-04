@@ -67,7 +67,8 @@
                 size: "normal",
                 appearance: "always",
                 callback: function (token) {
-                    verify(token)
+                    // verify(token)
+                    verifyByWorker(token)
                 }
             });
         })
@@ -102,7 +103,19 @@
                     // 處理錯誤
                     console.error('Error:', error);
                 });
-
+        }
+        function verifyByWorker(token) {
+            const url = 'https://worker-summer-bird-5004.tomtang.workers.dev/';
+            const formData = new FormData();
+            formData.append('cf-turnstile-response', token);
+            const response = fetch(url, {
+                method: 'POST',
+                body: formData,
+            }).then((result) => {
+                return result.text();
+            }).then((text) => {
+                console.log(text);
+            })
         }
     </script>
 }
