@@ -60,48 +60,62 @@
 </div>
 @section scripts_body{
     <script>
-        turnstile.ready(function () {
-            turnstile.render('#myWidget', {
-                sitekey: '0x4AAAAAAAPGUjEJ-frzVnmP',
-                theme: 'light',
-                size: "normal",
-                appearance: "always",
-                callback: function (token) {
-                    // verify(token)
-                    verifyByWorker(token)
-                }
-            });
-        })
+        function initTurnstile() {
+            let vm = this;
+            turnstile.ready(function () {
+                turnstile.render('#myWidget', {
+                    sitekey: '0x4AAAAAAAPGUjEJ-frzVnmP',
+                    theme: 'light',
+                    size: "normal",
+                    appearance: "always",
+                    callback: function (token) {
+                        // verify(token)
+                        // verifyByWorker(token)
+                        vm.captcha = true;
+                        vm.turnstileToken = token;
+                    }
+                });
+            })
+        }
         
         const app = {
             data() {
                 return {
                     account:'',
-                    password:''
+                    password:'',
+                    turnstileToken:'',
+                    captcha: false
                 }
             },
             methods: {
-                login:login
+                login:login,
+                initTurnstile: initTurnstile,
+                verify: verify
             },
             mounted() {
-                // _turnstileCb();
+                this.initTurnstile();
             },
         }
         let myApp = Vue.createApp(app);
         myApp.mount("#app");
 
         function login() {
-
+            if (!this.captcha) {
+                alert('請等候身分驗證');
+                return
+            }
+            this.verify();
         }
-        function verify(token) {
-            let data = { id: token }
+        function verify() {
+            let vm = this;
+            let data = { id: vm.turnstileToken }
             axios.post('/api/Validate/ValidateTurnstile', data).then(response => {
                 // 處理成功的回應
-                console.log(response.data);
+                alert('登入驗證成功')
             })
                 .catch(error => {
                     // 處理錯誤
-                    console.error('Error:', error);
+                    alert('登入驗證失敗')
                 });
         }
         function verifyByWorker(token) {
